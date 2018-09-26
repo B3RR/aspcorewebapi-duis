@@ -13,19 +13,23 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace aspcorewebapi_duis.Filters
 {
-    
+
     public class DuisAuthorizationFilter : IAuthorizationFilter
     {
         private readonly IHostingEnvironment _env;
 
         public DuisAuthorizationFilter(IHostingEnvironment env)
         {
-            _env = env ?? throw new ArgumentNullException(nameof(env));;
+            _env = env ?? throw new ArgumentNullException(nameof(env)); ;
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var claims = context?.HttpContext?.User?.Identities.Where(x => x.AuthenticationType == _env.ApplicationName.ToLower()).FirstOrDefault()?.Claims;
-            var isAuth=context?.HttpContext?.User?.Identity?.IsAuthenticated;
+            if (context?.HttpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                throw new DuisException("You must sing in");
+            }
+            var claims = context?.HttpContext?.User?.Identities.Where(x => x.AuthenticationType == "DUIS" 
+                                                                           && x.Name == _env.ApplicationName.ToLower()).FirstOrDefault()?.Claims;
             if (claims != null && claims.Count() > 0)
             {
                 var verb = context.ActionDescriptor.RouteValues.Single(x => x.Key == "action").Value.ToUpper();

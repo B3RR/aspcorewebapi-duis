@@ -33,45 +33,50 @@ namespace aspcorewebapi_duis.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Login == username);
             if (user != null)
             {
-                await GetCookieIdentityAsync(user);
+                await SetCookieIdentityAsync(user);
                 return Ok($"200 {user.Login} - success");
             }
             else
             {
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                return StatusCode(401,$"401 {username} - fail");
+                return StatusCode(401, $"401 {username} - fail");
             }
         }
 
-        private async Task GetCookieIdentityAsync(User user)
+        private async Task SetCookieIdentityAsync(User user)
         {
             if (user != null)
             {
                 var rolesIds = _context.RoleUsers.Where(x => x.UserId == user.ID).AsNoTracking().Select(x => x.RoleId).Distinct();
                 var rules = _context.Rules.Where(x => rolesIds.Contains(x.RoleId)).AsNoTracking();
                 var claimsIdentities = new List<ClaimsIdentity>();
-
-                foreach (var aName in rules.Select(x => x.ApplicationName).Distinct())
-                {
-                    var claims = new List<Claim>()
+                var claims = new List<Claim>()
                         {
                             new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                            new Claim(ClaimsIdentity.DefaultRoleClaimType, aName),
-                            new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
+                            new Claim(ClaimsIdentity.DefaultRoleClaimType, "Default"),
+                            new Claim(ClaimTypes.NameIdentifier, user.ID.ToString(), ClaimValueTypes.Integer32),
                             new Claim(ClaimTypes.Surname, user.FIO),
                             new Claim(ClaimTypes.Email, user.Email)
                         };
-                    foreach (var rule in rules.Where(x => x.ApplicationName == aName))
+
+                claimsIdentities.Add(new ClaimsIdentity(claims, "Default", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType));
+                foreach (var appName in rules.Select(x => x.ApplicationName).Distinct())
+                {
+                    claims = new List<Claim>() { new Claim(ClaimsIdentity.DefaultNameClaimType, appName) };
+                    foreach (var rule in rules.Where(x => x.ApplicationName == appName && x.DuisId > 0))
                     {
-                        claims.Add(new Claim(rule.Controller, ((int)rule.DuisEnum).ToString()));
+                        claims.Add(new Claim(rule.Controller, ((int)rule.DuisEnum).ToString(),ClaimValueTypes.Integer32));
                     }
-                    claimsIdentities.Add(new ClaimsIdentity(claims, aName, ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType));
+                    if (claims.Count > 1)
+                    {
+                        claimsIdentities.Add(new ClaimsIdentity(claims, "DUIS", ClaimsIdentity.DefaultNameClaimType, "none"));
+                    }
                 }
                 var cp = new ClaimsPrincipal();
                 cp.AddIdentities(claimsIdentities);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp);
             }
-        
+
         }
     }
 }
