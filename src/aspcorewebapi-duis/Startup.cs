@@ -35,7 +35,9 @@ namespace aspcorewebapi_duis
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddScoped<Filters.DuisAuthorizationFilter>();
             services.AddDbContext<SQLContext>(options =>
-                            options.UseSqlite(Configuration.GetSection("connectionStrings").GetChildren().Where(x => x.Key == "sqlite").FirstOrDefault().Value));
+                            options.UseSqlite(Configuration.GetSection("connectionStrings")
+                            .GetChildren()
+                            .FirstOrDefault(x => x.Key == "sqlite").Value));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
