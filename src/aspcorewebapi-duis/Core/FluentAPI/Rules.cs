@@ -13,7 +13,7 @@ namespace aspcorewebapi_duis.Core.FluentAPI
             modelBuilder.Entity<Rule>().Property(x => x.ApplicationName).HasMaxLength(255).IsRequired();
             modelBuilder.Entity<Rule>().HasIndex(p => new { p.RoleId, p.Controller, p.ApplicationName }).IsUnique();
             modelBuilder.Entity<Rule>().HasData(
-                new Rule { ID = 1, DuisId = 15, RoleId = 1, ApplicationName = "aspcorewebapi-duis", Controller = "values" });
+                new Rule { ID = 1, DuisId = 15, RoleId = 1, ApplicationName = "aspcorewebapi-duis", Controller = "userinfo" });
         }
     }
 }

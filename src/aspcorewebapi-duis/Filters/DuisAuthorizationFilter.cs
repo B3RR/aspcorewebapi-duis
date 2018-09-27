@@ -28,8 +28,7 @@ namespace aspcorewebapi_duis.Filters
             {
                 throw new DuisException("You must sing in");
             }
-            var claims = context?.HttpContext?.User?.Identities.Where(x => x.AuthenticationType == "DUIS" 
-                                                                           && x.Name == _env.ApplicationName.ToLower()).FirstOrDefault()?.Claims;
+            var claims = context?.HttpContext?.User?.Identities.FirstOrDefault(x => x.AuthenticationType == _env.ApplicationName.ToLower())?.Claims;
             if (claims != null && claims.Count() > 0)
             {
                 var verb = context.ActionDescriptor.RouteValues.Single(x => x.Key == "action").Value.ToUpper();

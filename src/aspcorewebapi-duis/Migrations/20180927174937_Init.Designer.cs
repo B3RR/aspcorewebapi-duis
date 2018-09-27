@@ -9,7 +9,7 @@ using aspcorewebapi_duis.Core;
 namespace aspcorewebapiduis.Migrations
 {
     [DbContext(typeof(SQLContext))]
-    [Migration("20180925173702_Init")]
+    [Migration("20180927174937_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,7 +125,7 @@ namespace aspcorewebapiduis.Migrations
                     b.ToTable("Rules");
 
                     b.HasData(
-                        new { ID = 1, ApplicationName = "aspcorewebapi-duis", Controller = "values", DuisId = 15, RoleId = 1 }
+                        new { ID = 1, ApplicationName = "aspcorewebapi-duis", Controller = "userinfo", DuisId = 15, RoleId = 1 }
                     );
                 });
 

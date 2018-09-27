@@ -123,7 +123,7 @@ namespace aspcorewebapiduis.Migrations
                     b.ToTable("Rules");
 
                     b.HasData(
-                        new { ID = 1, ApplicationName = "aspcorewebapi-duis", Controller = "values", DuisId = 15, RoleId = 1 }
+                        new { ID = 1, ApplicationName = "aspcorewebapi-duis", Controller = "userinfo", DuisId = 15, RoleId = 1 }
                     );
                 });
 

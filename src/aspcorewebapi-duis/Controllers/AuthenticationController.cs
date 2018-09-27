@@ -30,6 +30,11 @@ namespace aspcorewebapi_duis.Controllers
         [HttpGet]
         public async Task<ActionResult> Get([FromQuery] string username)
         {
+            if (String.IsNullOrWhiteSpace(username))
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return Ok($"200 success sing out");
+            }
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Login == username);
             if (user != null)
             {
@@ -38,7 +43,6 @@ namespace aspcorewebapi_duis.Controllers
             }
             else
             {
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 return StatusCode(401, $"401 {username} - fail");
             }
         }
@@ -65,11 +69,14 @@ namespace aspcorewebapi_duis.Controllers
                     claims = new List<Claim>() { new Claim(ClaimsIdentity.DefaultNameClaimType, appName) };
                     foreach (var rule in rules.Where(x => x.ApplicationName == appName && x.DuisId > 0))
                     {
-                        claims.Add(new Claim(rule.Controller, ((int)rule.DuisEnum).ToString(),ClaimValueTypes.Integer32));
+                        if (!claims.Any(x => x.Type == rule.Controller))
+                        {
+                            claims.Add(new Claim(rule.Controller, ((int)rule.DuisEnum).ToString(), ClaimValueTypes.Integer32));
+                        }
                     }
                     if (claims.Count > 1)
                     {
-                        claimsIdentities.Add(new ClaimsIdentity(claims, "DUIS", ClaimsIdentity.DefaultNameClaimType, "none"));
+                        claimsIdentities.Add(new ClaimsIdentity(claims, appName));
                     }
                 }
                 var cp = new ClaimsPrincipal();

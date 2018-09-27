@@ -193,7 +193,7 @@ namespace aspcorewebapiduis.Migrations
             migrationBuilder.InsertData(
                 table: "Rules",
                 columns: new[] { "ID", "ApplicationName", "Controller", "DuisId", "RoleId" },
-                values: new object[] { 1, "aspcorewebapi-duis", "values", 15, 1 });
+                values: new object[] { 1, "aspcorewebapi-duis", "userinfo", 15, 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Duis_ID",
